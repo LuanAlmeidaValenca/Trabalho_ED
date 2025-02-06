@@ -3,44 +3,69 @@
 typedef struct no{
     int horario[4], PFPJ, preferencial;
     char nome[40];
-    Cliente *prox = NULL;
+    Cliente *prox;
 } Cliente;
 
 typedef struct fila_banco{
     int tamanho;
-    Cliente *primeiro = NULL;
+    Cliente *primeiro;
 } Fila;
 
 Fila criarFila(Fila *fila){
     fila = (Fila *) malloc(sizeof(Fila));
     if(fila){
-        fila->tamanho = 0;    
+        fila->tamanho = 0;  
+        fila->primeiro = NULL;  
     }
-    return fila;
+    return *fila;
 }
 
-void imprimirFila(Fila *fila){
-    if (Fila->tamanho == 0){
-        printf("\nLista vazia\n");
-    }else{
-    Cliente no = lista->inicio;
-        if(no){
-            do{
-                printf("-------------------");
-                printf("\nNome: %s", no->nome);
-                printf("\nPreferencia: %d", no->preferencial);
-                printf("\nÉ pf ou pj: ", no->PFPJ);
-                printf("\nHorário de chegada: %d%d:%d%d", cliente->horario[0],cliente->horario[1],cliente->horario[2],cliente->horario[3]);
-                printf("-------------------\n");
-                no = no->prox;
-            }while (no->prox != NULL);    
-        }
+void imprimirFila(Fila *fila) {
+    if (fila->tamanho == 0) {
+        printf("\nFila vazia\n");
+        return;
+    }
+
+    Cliente *no = fila->primeiro;
+    printf("\n--- FILA DE CLIENTES ---\n");
+    
+    while (no != NULL) {
+        printf("-------------------\n");
+        printf("Nome: %s\n", no->nome);
+        printf("Preferência: %d\n", no->preferencial);
+        printf("É PF ou PJ: %d\n", no->PFPJ);
+        printf("Horário de chegada: %d%d:%d%d\n", 
+               no->horario[0], no->horario[1], no->horario[2], no->horario[3]);
+        printf("-------------------\n");
+        
+        no = no->prox;
     }
 }
 
 void inserirNaFila(Fila *fila, char nome, int hora, int PFPJ, int preferencial){
-        
+    Cliente *novo = (Cliente *)malloc(sizeof(Cliente));
+    if (!novo) {
+        printf("Erro ao alocar memória!\n");
+        return;
+    }
+
+    strcpy(novo->nome, nome);
+    memcpy(novo->horario, &hora, 4 * sizeof(int));
+    novo->PFPJ = PFPJ;
+    novo->preferencial = preferencial;
+    novo->prox = NULL;
     
+    if (fila->primeiro == NULL) {
+        fila->primeiro = novo;
+    } else {
+        Cliente *temp = fila->primeiro;
+        while (temp->prox != NULL) {
+            temp = temp->prox;
+        }
+        temp->prox = novo;
+    }
+
+    fila->tamanho++;
 }
 
 void removerDaFila();
