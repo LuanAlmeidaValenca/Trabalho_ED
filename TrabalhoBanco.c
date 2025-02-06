@@ -73,11 +73,22 @@ void verPrevisao();
 void atender();
 void juntarFilas();
 void separarFilas();
-void liberarMemoria();
+
+void liberarMemoria(Fila *fila) {
+    Cliente *temp = fila->primeiro;
+    while (temp != NULL) {
+        Cliente *remover = temp;
+        temp = temp->prox;
+        free(remover);
+    }
+    fila->tamanho = 0;
+    fila->primeiro = NULL;
+}
 
 int main() {
-    int escolha;
-    
+    int escolha, hora[4], PFouPJ, preferencial;
+    Fila fila;
+    char nome[30];
     
     while(escolha != 9){
         
@@ -98,42 +109,43 @@ int main() {
         }
         
         switch (escolha){
-            case 1 : 
-                criarFila();
+            case 1: 
+                criarFila(&fila);
             break;
             
-            case 2 : 
-                imprimirFila();
+            case 2: 
+                imprimirFila(&fila);
             break;
             
-            case 3 : 
-                inserirNaFila();
+            case 3: 
+                inserirNaFila(&fila, nome, hora, PFouPJ, preferencial);
             break;
             
-            case 4 : 
+            case 4: 
                 removerDaFila();
             break;
             
-            case 5 : 
+            case 5: 
                 verPrevisao();
             break;
             
-            case 6 : 
+            case 6: 
                 atender();
             break;
             
-            case 7 :
+            case 7:
                 juntarFilas();
             break;
             
-            case 8 : 
+            case 8: 
                 separarFilas();
             break;
             
-            case 9 :
-                liberarMemoria();
+            case 9:
+                liberarMemoria(&fila);
             break;
-            default : break;
+            default:
+            printf("Opção inválida");
         }
     }
 
