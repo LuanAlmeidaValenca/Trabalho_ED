@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define previsao = 5;
+
 typedef struct no{
     int horario[4], PFPJ, preferencial;
     char nome[40];
@@ -24,6 +26,7 @@ void imprimirFila(Fila fila) {
 
     if (!no){
         printf("\nFila vazia\n");
+        return;
     }
     
     printf("\n----- FILA DE CLIENTES -----\n");
@@ -39,7 +42,7 @@ void imprimirFila(Fila fila) {
         if(no->PFPJ){
             printf("Pessoa fisica\n");
         }else{
-            printf("Pessoa juridica\n'");
+            printf("Pessoa juridica\n");
         }
         printf("Horario de chegada: %d%d:%d%d\n", 
                no->horario[0], no->horario[1], no->horario[2], no->horario[3]);
@@ -50,18 +53,42 @@ void imprimirFila(Fila fila) {
 }
 
 
-void inserirNaFila(Fila *fila, char *nome, int hora[4], int PFPJ, int preferencial){
+void inserirNaFila(Fila *fila, int hora[4]/*, char *nome, int PFPJ, int preferencial*/){
     No *aux, *novo = (No *)malloc(sizeof(No));
+
     if (!novo) {
         printf("\nErro ao alocar memoria!\n");
         return;
     }
 
+    printf("\nInsira o nome do cliente: ");
+    fgets(novo->nome, sizeof(novo->nome), stdin);
+
+    memcpy(novo->horario, hora, 4 * sizeof(int));
+    getchar();
+
+    printf("\nInsira se o cliente eh PF ou PJ (1 para PF, 0 para PJ): ");
+    scanf("%d", &novo->PFPJ);
+    getchar();
+
+    if(novo->PFPJ != 1 && novo->PFPJ != 0){
+        printf("\nOpcao invalida\n");
+        return;
+    }
+    printf("\nInsira se o cliente eh preferencial (1 para sim, 0 para nao): ");
+    scanf("%d", &novo->preferencial);
+    getchar();
+    if(novo->preferencial != 1 && novo->preferencial != 0){
+        printf("\nOpcao invalida\n");
+        return;
+    }
+    /*
     strcpy(novo->nome, nome);
     memcpy(novo->horario, hora, 4 * sizeof(int));
     novo->PFPJ = PFPJ;
     novo->preferencial = preferencial;
     novo->prox = NULL;
+    */
     
     if (fila->primeiro == NULL) {
         fila->primeiro = novo;
@@ -87,6 +114,13 @@ void removerDaFila(Fila *fila){
     fila->primeiro = fila->primeiro->prox;
     free(temp);
     fila->tamanho--;
+
+    printf("Cliente removido com sucesso");
+}
+
+void ordenarFila(Fila *fila, int qntdPreferencial){
+    No percorre;
+    
 }
 
 void verPrevisao();
@@ -107,11 +141,18 @@ void liberarMemoria(Fila *fila) {
 }
 
 int main() {
-    int escolha = 0, hora[4], PFouPJ, preferencial;
-    Fila fila;
+    int hora[4], ultimoHorario[4];
+    int escolha = 0, PFouPJ, preferencial, preferencialAtendido = 0;
     char nome[30];
+    Fila fila;
+
+    for(int i = 0; i < 4; i++){
+        ultimoHorario[i] = 0;
+    }
     
     while(escolha != 9){
+
+        char temp;
         
         printf("\n1 - Criar fila");
         printf("\n2 - Ver fila");
@@ -136,26 +177,17 @@ int main() {
             break;
             
             case 3: 
-                printf("\nInsira o nome do cliente: ");
-                fgets(nome, sizeof(nome), stdin);
-                printf("\nInsira o horario de chegada do cliente (Sem ':'): ");
-                scanf("%1d%1d%1d%1d", &hora[0], &hora[1], &hora[2], &hora[3]);
+                printf("\nInsira o horario de chegada do cliente (XX:XX): ");
+                scanf("%1d%1d%c%1d%1d", &hora[0], &hora[1], &temp , &hora[2], &hora[3]);
                 getchar();
-                printf("\nInsira se o cliente eh PF ou PJ (1 para PF, 0 para PJ): ");
-                scanf("%d", &PFouPJ);
-                getchar();
-                if(PFouPJ != 1 && PFouPJ != 0){
-                    printf("\nOpcao invalida\n");
+                if ((hora[0] * 10 + hora[1]) * 60 + (hora[2] * 10 + hora[3]) < (ultimoHorario[0] * 10 + ultimoHorario[1]) * 60 + (ultimoHorario[2] * 10 + ultimoHorario[3])) {
+                    printf("\nHorario de chegada invalido");
+                    printf("\nChegada do cliente anterior: %d%d:%d%d", ultimoHorario[0], ultimoHorario[1], ultimoHorario[2], ultimoHorario[3]);
                     break;
                 }
-                printf("\nInsira se o cliente eh preferencial (1 para sim, 0 para nao): ");
-                scanf("%d", &preferencial);
-                getchar();
-                if(preferencial != 1 && preferencial != 0){
-                    printf("\nOpcao invalida\n");
-                    break;
-                }
-                inserirNaFila(&fila, nome, hora, PFouPJ, preferencial);
+                memcpy(ultimoHorario, hora, 4 * sizeof(int));
+                
+                inserirNaFila(&fila, hora/*, nome, PFouPJ, preferencial*/);
             break;
             
             case 4: 
