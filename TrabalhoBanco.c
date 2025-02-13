@@ -4,6 +4,18 @@
 
 #define previsao = 5;
 
+/*A FAZER:
+Implementar atendimento, ordenar fila, mostrar previsão para atendimento de acordo com o cliente,
+merge das filas, unir as filas
+OPCIONAL, mudança no case 3 para ter mais de uma variavel de ultimoHorario[4]
+(sendo 1 para PF e outro para PJ)
+*/
+/*
+Sugestões para organização das filas:
+Manter uma fila para PF e outra para PJ, não necessáriamente ordenada, e fazer checagem de prioridade
+de atendimento durante a execução da função atender
+*/
+
 typedef struct no{
     int horario[4], PFPJ, preferencial;
     char nome[40];
@@ -13,11 +25,13 @@ typedef struct no{
 typedef struct fila_banco{
     int tamanho;
     No *primeiro;
+    No *ultimo;
 } Fila;
 
 void criarFila(Fila *fila){
         fila->tamanho = 0;  
         fila->primeiro = NULL;  
+        fila->ultimo = NULL;
         printf("\nFila criada com sucesso\n");
 }
 
@@ -53,7 +67,7 @@ void imprimirFila(Fila fila) {
 }
 
 
-void inserirNaFila(Fila *fila, int hora[4]/*, char *nome, int PFPJ, int preferencial*/){
+void inserirNaFila(Fila *filaPF, Fila *filaPJ, int hora[4]/*, char *nome, int PFPJ, int preferencial*/){
     No *aux, *novo = (No *)malloc(sizeof(No));
 
     if (!novo) {
@@ -67,21 +81,44 @@ void inserirNaFila(Fila *fila, int hora[4]/*, char *nome, int PFPJ, int preferen
     memcpy(novo->horario, hora, 4 * sizeof(int));
     getchar();
 
-    printf("\nInsira se o cliente eh PF ou PJ (1 para PF, 0 para PJ): ");
-    scanf("%d", &novo->PFPJ);
-    getchar();
-
-    if(novo->PFPJ != 1 && novo->PFPJ != 0){
-        printf("\nOpcao invalida\n");
-        return;
-    }
     printf("\nInsira se o cliente eh preferencial (1 para sim, 0 para nao): ");
     scanf("%d", &novo->preferencial);
     getchar();
     if(novo->preferencial != 1 && novo->preferencial != 0){
         printf("\nOpcao invalida\n");
+        free(novo);
         return;
     }
+
+    printf("\nInsira se o cliente eh PF ou PJ (1 para PF, 0 para PJ): ");
+    scanf("%d", &novo->PFPJ);
+    getchar();
+    if(novo->PFPJ != 1 && novo->PFPJ != 0){
+        printf("\nOpcao invalida\n");
+        return;
+    }
+    if(novo->PFPJ == 1){
+        novo->prox = NULL;
+
+        if (filaPF->primeiro == NULL) { // Se a fila estiver vazia
+            filaPF->primeiro = novo;
+            filaPF->ultimo = novo;
+        } else {
+            filaPF->ultimo->prox = novo;
+            filaPF->ultimo = novo; 
+        }
+        filaPF->tamanho++;
+    } else{
+        if (filaPJ->primeiro == NULL) { // Se a fila estiver vazia
+            filaPJ->primeiro = novo;
+            filaPJ->ultimo = novo;
+        } else {
+            filaPJ->ultimo->prox = novo;
+            filaPJ->ultimo = novo; 
+        }
+        filaPJ->tamanho++;
+    }
+
     /*
     strcpy(novo->nome, nome);
     memcpy(novo->horario, hora, 4 * sizeof(int));
@@ -89,19 +126,8 @@ void inserirNaFila(Fila *fila, int hora[4]/*, char *nome, int PFPJ, int preferen
     novo->preferencial = preferencial;
     novo->prox = NULL;
     */
-    
-    if (fila->primeiro == NULL) {
-        fila->primeiro = novo;
-    } else {
-        aux = fila->primeiro;
-        while (aux->prox != NULL) {
-            aux = aux->prox;
-        }
-        aux->prox = novo;
-    }
 
-    fila->tamanho++;
-    printf("\nCliente adicionado com sucesso\n");
+    printf("\nCliente adicionado com sucesso!\n");
 }
 
 void removerDaFila(Fila *fila){
@@ -110,41 +136,83 @@ void removerDaFila(Fila *fila){
         return;
     }
 
-    No *temp = fila->primeiro;
-    fila->primeiro = fila->primeiro->prox;
-    free(temp);
+    No *remover = fila->primeiro;
+    fila->primeiro = remover->prox;
+    if (fila->primeiro == NULL){ // caso a lista fique vazia, atualiza o ultimo
+        fila->ultimo = NULL;
+    }
+
+    free(remover);
     fila->tamanho--;
 
-    printf("Cliente removido com sucesso");
+    printf("Cliente removido com sucesso!");
 }
 
-void ordenarFila(Fila *fila, int qntdPreferencial){
-    No percorre;
+void ordenarFila(Fila *filaPF, Fila *filaPJ, int qntdPreferencial){
+    if(filaPF->tamanho == 0){
+        printf("Lista vazia");
+        return;
+    }
+
+    No* temp = filaPF;
+    do{
+
+    }while (temp);
+    
     
 }
 
 void verPrevisao();
-void atender();
-void juntarFilas();
+
+void atender(Fila *filaPF, Fila *filaPJ, int uniao){
+    int filaEscolhida;
+
+    if(!uniao){
+        printf("\n Insira qual fila deseja atender no momento (0 para PJ, 1 para PF): ");
+        scanf("%d", &filaEscolhida);
+        if (filaEscolhida){
+            
+        }
+    }
+}
+
+int juntarFilas(int uniao){
+
+    return uniao; //caso o procedimento seja bem sucedido
+}
 void separarFilas();
 
-void liberarMemoria(Fila *fila) {
-    No *temp = fila->primeiro;
+void liberarMemoria(Fila *filaPF, Fila *filaPJ) {
+    No *temp = filaPF->primeiro;
     while (temp != NULL) {
-        No *remover = temp;
-        temp = temp->prox;
-        free(remover);
+        No *proxNo = temp->prox;
+        free(temp);
+        temp = proxNo;
     }
-    fila->tamanho = 0;
-    fila->primeiro = NULL;
-    printf("\nMemoria liberada!\n");
+
+    filaPF->primeiro = NULL;
+    filaPF->ultimo = NULL;
+    filaPF->tamanho = 0;
+
+    No *temp2 = filaPJ->primeiro;
+    while (temp2 != NULL) {
+        No *proxNo = temp2->prox;
+        free(temp2);
+        temp2 = proxNo;
+    }
+
+    filaPJ->primeiro = NULL;
+    filaPJ->ultimo = NULL;
+    filaPJ->tamanho = 0;
+
+    printf("\nMemória liberada!\n");
 }
 
 int main() {
     int hora[4], ultimoHorario[4];
-    int escolha = 0, PFouPJ, preferencial, preferencialAtendido = 0;
+    int escolha = 0, escolhaFila, PFouPJ, preferencial, preferencialAtendido = 0, uniaoFila;
     char nome[30];
-    Fila fila;
+    Fila filaPF, filaPJ;
 
     for(int i = 0; i < 4; i++){
         ultimoHorario[i] = 0;
@@ -169,17 +237,25 @@ int main() {
         
         switch (escolha){
             case 1: 
-                criarFila(&fila);
+                criarFila(&filaPF);
+                criarFila(&filaPJ);
             break;
             
             case 2: 
-                imprimirFila(fila);
+                printf("\nInsira qual fila deseja imprimir (0 para PJ, 1 para PF):");
+                scanf("%d", &escolhaFila);
+                if(escolhaFila){
+                    imprimirFila(filaPF);
+                }else{
+                    imprimirFila(filaPJ);
+                }
             break;
             
             case 3: 
                 printf("\nInsira o horario de chegada do cliente (XX:XX): ");
                 scanf("%1d%1d%c%1d%1d", &hora[0], &hora[1], &temp , &hora[2], &hora[3]);
                 getchar();
+                // Esse if verifica se o horario de chegada do cliente condiz com o horario do anterior 
                 if ((hora[0] * 10 + hora[1]) * 60 + (hora[2] * 10 + hora[3]) < (ultimoHorario[0] * 10 + ultimoHorario[1]) * 60 + (ultimoHorario[2] * 10 + ultimoHorario[3])) {
                     printf("\nHorario de chegada invalido");
                     printf("\nChegada do cliente anterior: %d%d:%d%d", ultimoHorario[0], ultimoHorario[1], ultimoHorario[2], ultimoHorario[3]);
@@ -187,11 +263,12 @@ int main() {
                 }
                 memcpy(ultimoHorario, hora, 4 * sizeof(int));
                 
-                inserirNaFila(&fila, hora/*, nome, PFouPJ, preferencial*/);
+                inserirNaFila(&filaPF, &filaPJ, hora/*, nome, PFouPJ, preferencial*/);
             break;
             
             case 4: 
-                removerDaFila(&fila);
+                removerDaFila(&filaPF);
+                removerDaFila(&filaPJ);
             break;
             
             case 5: 
@@ -203,7 +280,7 @@ int main() {
             break;
             
             case 7:
-                //juntarFilas();
+                //juntarFilas(uniaoFila);
             break;
             
             case 8: 
@@ -211,7 +288,7 @@ int main() {
             break;
             
             case 9:
-                liberarMemoria(&fila);
+                liberarMemoria(&filaPF, &filaPJ);
             break;
             default:
             printf("\nOpção inválida\n");
