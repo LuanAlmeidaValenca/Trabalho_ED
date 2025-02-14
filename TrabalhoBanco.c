@@ -153,7 +153,7 @@ void removerDaFila(Fila *fila)
 
 void verPrevisao();
 
-void atender(Fila *filaPF, Fila *filaPJ, int uniao, int QPreferencial)
+void atender(Fila *fila, int uniao, int QPreferencial)
 {
     int filaEscolhida;
 
