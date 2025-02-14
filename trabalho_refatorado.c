@@ -309,34 +309,84 @@ void juntarFilas(Fila *filaPF, Fila *filaPJ, Fila *filaUnificada)
     filaUnificada->ultimo = temp;
 }
 
-void atender(Fila *fila, int *QPreferencial)
-{
-    if (fila->primeiro == NULL)
-    {
+void atender(Fila *fila, int *QPreferencial) {
+    if (fila->primeiro == NULL) {
         printf("\nNao ha clientes para atender.\n");
         return;
     }
 
-    No *atendido = fila->primeiro;
-    fila->primeiro = atendido->prox;
-    if (fila->primeiro == NULL)
-    {
-        fila->ultimo = NULL;
-    }
+    No *atendido = NULL;
+    No *anterior = NULL;
+    No *atual = fila->primeiro;
 
-    printf("\nAtendendo cliente: %s\n", atendido->nome);
-    if (atendido->preferencial)
-    {
-        (*QPreferencial)++;
-        if (*QPreferencial == 3)
-        {
-            *QPreferencial = 0;
+    if (*QPreferencial == 3) {
+        // Procura o primeiro cliente NÃO prioritário
+        while (atual != NULL && atual->preferencial) {
+            anterior = atual;
+            atual = atual->prox;
+        }
+
+        if (atual != NULL) {
+            atendido = atual;
+            // Remove o cliente não prioritário da fila
+            if (anterior == NULL) {
+                fila->primeiro = atendido->prox;
+            } else {
+                anterior->prox = atendido->prox;
+            }
+
+            if (atendido->prox == NULL) {
+                fila->ultimo = anterior;
+            }
+            *QPreferencial = 0; // Reinicia o contador
+        } else {
+            // Não há não prioritários, atende o próximo prioritário
+            atendido = fila->primeiro;
+            fila->primeiro = atendido->prox;
+            if (fila->primeiro == NULL) {
+                fila->ultimo = NULL;
+            }
+            *QPreferencial = 0; // Reinicia após atender prioritário
+        }
+    } else {
+        // Procura o primeiro cliente PRIORITÁRIO (ignorando não prioritários à frente)
+        No *anterior_prioritario = NULL;
+        No *prioritario = fila->primeiro;
+
+        while (prioritario != NULL && !prioritario->preferencial) {
+            anterior_prioritario = prioritario;
+            prioritario = prioritario->prox;
+        }
+
+        if (prioritario != NULL) {
+            // Atende o prioritário encontrado
+            atendido = prioritario;
+            if (anterior_prioritario == NULL) {
+                fila->primeiro = atendido->prox;
+            } else {
+                anterior_prioritario->prox = atendido->prox;
+            }
+
+            if (atendido->prox == NULL) {
+                fila->ultimo = anterior_prioritario;
+            }
+            (*QPreferencial)++; // Incrementa o contador
+        } else {
+            // Não há prioritários, atende o primeiro cliente (não prioritário)
+            atendido = fila->primeiro;
+            fila->primeiro = atendido->prox;
+            if (fila->primeiro == NULL) {
+                fila->ultimo = NULL;
+            }
+            *QPreferencial = 0; // Reinicia o contador
         }
     }
 
+    printf("\nAtendendo cliente: %s\n", atendido->nome);
     free(atendido);
     fila->tamanho--;
 }
+
 
 void liberarMemoria(Fila *fila)
 {
@@ -357,7 +407,7 @@ void liberarMemoria(Fila *fila)
 
 int main()
 {
-    int hora[4], ultimoHorarioPF[4], ultimoHorarioPJ[4];
+    int hora[4], ultimoHorarioPF[4], ultimoHorarioPJ[4], ultimoHorarioGeral[4];
     int escolha = 0, escolhaFila, PFouPJ, uniaoFila = 0, QPreferencial = 0;
     Fila filaPF, filaPJ, filaUnificada;
 
