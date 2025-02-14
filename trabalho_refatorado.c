@@ -1,22 +1,30 @@
+/*Discentes:
+Cauan Teixeira Machado
+Cézar Augusto Nascimeto Dias
+Luan Almeida Valença
+Maria Eduarda Mascarenhas da Silva
+Paulo Henrique Melo Rugani de Souza
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct no
+typedef struct no //Estrutura do no da fila
 {
     int horario[4], PFPJ, preferencial;
     char nome[40];
     struct no *prox;
 } No;
 
-typedef struct fila_banco
+typedef struct fila_banco // Estrutura da fila
 {
     int tamanho;
     No *primeiro;
     No *ultimo;
 } Fila;
 
-void criarFila(Fila *fila)
+void criarFila(Fila *fila) //Inicializa fila vazia
 {
     fila->tamanho = 0;
     fila->primeiro = NULL;
@@ -24,7 +32,7 @@ void criarFila(Fila *fila)
     printf("\nFila criada com sucesso\n");
 }
 
-void imprimirFila(Fila fila)
+void imprimirFila(Fila fila) //Imprime a fila, detalhando cada elemento da estrutura no 
 {
     No *no = fila.primeiro;
 
@@ -35,7 +43,7 @@ void imprimirFila(Fila fila)
     }
 
     printf("\n----- FILA DE CLIENTES -----\n");
-
+    //Inicia a impressão
     while (no)
     {
         printf("----------------------------\n");
@@ -64,7 +72,7 @@ void imprimirFila(Fila fila)
     printf("----------------------------\n");
 }
 
-void inserirNaFila(Fila *fila, int hora[4], int PFPJ, int *ultimoHorario)
+void inserirNaFila(Fila *fila, int hora[4], int PFPJ, int *ultimoHorario) //Coloca o cliente no final da fila, obedecendo o FIFO
 {
     No *novo = (No *)malloc(sizeof(No));
 
@@ -87,7 +95,7 @@ void inserirNaFila(Fila *fila, int hora[4], int PFPJ, int *ultimoHorario)
     if (novo->preferencial != 1 && novo->preferencial != 0)
     {
         printf("\nOpcao invalida\n");
-        free(novo);
+        free(novo); //Libera memoria em caso de erro
         return;
     }
 
@@ -111,7 +119,7 @@ void inserirNaFila(Fila *fila, int hora[4], int PFPJ, int *ultimoHorario)
     printf("\nCliente adicionado com sucesso!\n");
 }
 
-void removerDaFila(Fila *fila)
+void removerDaFila(Fila *fila) //Remove o primeiro cliente da fila
 {
     if (fila->primeiro == NULL)
     {
@@ -126,13 +134,13 @@ void removerDaFila(Fila *fila)
         fila->ultimo = NULL;
     }
 
-    free(remover);
+    free(remover); //Libera a memoria alocada para o ponteiro
     fila->tamanho--;
 
     printf("Cliente removido com sucesso!");
 }
 
-void exibirPrevisaoFila(Fila fila)
+void exibirPrevisaoFila(Fila fila) //Mostra quantas pessoas estão presentes na fila e quantas faltam para o cliente ser atendido
 {
     No *no = fila.primeiro;
     int posicao = 1;
@@ -157,7 +165,7 @@ void exibirPrevisaoFila(Fila fila)
 }
 
 void verPrevisao(Fila fila, char *nome)
-{
+{//Percorre a fila linearmente até encontrar o nome (O(n))
     No *no = fila.primeiro;
     int posicao = 1;
 
@@ -178,8 +186,8 @@ void verPrevisao(Fila fila, char *nome)
     printf("\nCliente nao encontrado na fila.\n");
 }
 
-void dividirLista(No *fonte, No **frente, No **atras)
-{
+void dividirLista(No *fonte, No **frente, No **atras) //Função auxiliar da função de Merge
+{//Divide uma lista encadeada em duas metades para o Merge Sort.
     No *rapido;
     No *lento;
     lento = fonte;
@@ -200,7 +208,7 @@ void dividirLista(No *fonte, No **frente, No **atras)
     lento->prox = NULL;
 }
 
-No *mesclarListas(No *a, No *b)
+No *mesclarListas(No *a, No *b) //Função auxiliar da função de Merge
 {
     No *resultado = NULL;
 
@@ -229,8 +237,8 @@ No *mesclarListas(No *a, No *b)
     return resultado;
 }
 
-void mergeSort(No **cabeca)
-{
+void mergeSort(No **cabeca)//Ordena a lista encadeada por horário de chegada.
+{//Divide a lista em duas e ordena recursivamente
     No *cabecaRef = *cabeca;
     No *a;
     No *b;
@@ -250,7 +258,7 @@ void mergeSort(No **cabeca)
 
 // Função auxiliar para copiar um nó de uma fila para outra
 void copiarNo(Fila *filaDestino, No *no)
-{
+{//Aloca novo nó e copia todos os dados do original.
     No *novo = (No *)malloc(sizeof(No));
     if (!novo)
     {
@@ -279,8 +287,8 @@ void copiarNo(Fila *filaDestino, No *no)
     filaDestino->tamanho++;
 }
 
-void juntarFilas(Fila *filaPF, Fila *filaPJ, Fila *filaUnificada)
-{
+void juntarFilas(Fila *filaPF, Fila *filaPJ, Fila *filaUnificada) // Junta as Filas PF e PJ numa só para suprir a necessidade durante o almoço
+{//Copia todos os nós das filas originais para a fila unificada e ordena a nova fila usando Merge Sort.
     
     No *noPF = filaPF->primeiro;
     while (noPF)
@@ -309,7 +317,7 @@ void juntarFilas(Fila *filaPF, Fila *filaPJ, Fila *filaUnificada)
     filaUnificada->ultimo = temp;
 }
 
-void atender(Fila *fila, int *QPreferencial) {
+void atender(Fila *fila, int *QPreferencial) {//Remove os clientes da fila de acordo com a regra de prioridade
     if (fila->primeiro == NULL) {
         printf("\nNao ha clientes para atender.\n");
         return;
