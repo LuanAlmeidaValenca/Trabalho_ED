@@ -477,8 +477,18 @@ int main()
 
             if (uniaoFila)
             {
+                if ((ultimoHorarioPF[0] * 10 + ultimoHorarioPF[1]) * 60 + (ultimoHorarioPF[2] * 10 + ultimoHorarioPF[3]) < (ultimoHorarioPJ[0] * 10 + ultimoHorarioPJ[1]) * 60 + (ultimoHorarioPJ[2] * 10 + ultimoHorarioPJ[3])){
+                    memcpy(ultimoHorarioGeral, ultimoHorarioPJ, 4 * sizeof(int));
+                }else{
+                    memcpy(ultimoHorarioGeral, ultimoHorarioPF, 4 * sizeof(int));
+                }
                 
-                inserirNaFila(&filaUnificada, hora, PFouPJ, NULL);
+                if((hora[0] * 10 + hora[1]) * 60 + (hora[2] * 10 + hora[3]) < (ultimoHorarioGeral[0] * 10 + ultimoHorarioGeral[1]) * 60 + (ultimoHorarioGeral[2] * 10 + ultimoHorarioGeral[3])){
+                    printf("\nHorario de chegada invalido");
+                    printf("\nChegada do cliente anterior: %d%d:%d%d", ultimoHorarioGeral[0], ultimoHorarioGeral[1], ultimoHorarioGeral[2], ultimoHorarioGeral[3]);
+                    break;
+                }
+                inserirNaFila(&filaUnificada, hora, PFouPJ, ultimoHorarioGeral);
             }
             else
             {
