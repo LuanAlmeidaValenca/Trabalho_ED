@@ -5,9 +5,7 @@
 #define previsao = 5;
 
 /*A FAZER:
-Implementar atendimento, mostrar previsão para atendimento de acordo com o cliente, tem algum erro na 
-hora de executar o case 7, quando tentei usar ele, o programa fechou, o problema deve vim de alguma
-implementação ou passagem errada de argumento (mb rapaziada) 
+Implementar atendimento, mostrar previsão para atendimento de acordo com o cliente.
 CORREÇÃO OPCIONAL:
 O armazenamento de ultimoHorario[] no case 3, esta sendo usado tanto para a fila Fisica quanto Juridica,
 porem, as duas filas independem uma da outra quanto a chegada, pode ser interessante criar um array para 
@@ -351,6 +349,7 @@ int main()
         case 1:
             criarFila(&filaPF);
             criarFila(&filaPJ);
+            criarFila(&filaUnificada);
             break;
 
         case 2:
